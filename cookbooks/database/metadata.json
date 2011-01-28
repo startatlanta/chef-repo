@@ -8,6 +8,9 @@
   "platforms": {
   },
   "dependencies": {
+    "mongodb": [
+
+    ],
     "mysql": [
 
     ],

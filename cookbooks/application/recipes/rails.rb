@@ -31,6 +31,7 @@ if node.run_state[:seen_recipes].has_key?("ruby_enterprise")
 end
 
 node.default[:apps][app['id']][node.app_environment][:run_migrations] = false
+db_config_name = 'database'
 
 ## First, install any application specific packages
 if app['packages']
@@ -125,8 +126,9 @@ if app["database_master_role"]
 
   # Assuming we have one...
   if dbm
-    template "#{app['deploy_to']}/shared/database.yml" do
-      source "database.yml.erb"
+    db_config_name = app["databases"][node.app_environment]["adapter"].eql?('mongoid') ? 'mongoid' : 'database'
+    template "#{app['deploy_to']}/shared/#{db_config_name}.yml" do
+      source "#{db_config_name}.yml.erb"
       owner app["owner"]
       group app["group"]
       mode "644"
@@ -136,7 +138,7 @@ if app["database_master_role"]
       )
     end
   else
-    Chef::Log.warn("No node with role #{app["database_master_role"][0]}, database.yml not rendered!")
+    Chef::Log.warn("No node with role #{app["database_master_role"][0]}, #{db_config_name}.yml not rendered!")
   end
 end
 
@@ -189,7 +191,7 @@ deploy_revision app['id'] do
       #
       # maybe worth doing run_symlinks_before_migrate before before_migrate callbacks,
       # or an add'l callback.
-      execute "(ln -s ../../../shared/database.yml config/database.yml && rake gems:install); rm config/database.yml" do
+      execute "(ln -s ../../../shared/#{db_config_name}.yml config/#{db_config_name}.yml && rake gems:install); rm config/#{db_config_name}.yml" do
         ignore_failure true
         cwd release_path
       end
@@ -197,7 +199,7 @@ deploy_revision app['id'] do
   end
 
   symlink_before_migrate({
-    "database.yml" => "config/database.yml",
+    "#{db_config_name}.yml" => "config/#{db_config_name}.yml",
     "memcached.yml" => "config/memcached.yml"
   })
 
