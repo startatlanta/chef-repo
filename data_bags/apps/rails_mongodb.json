@@ -1,0 +1,55 @@
+{
+  "id": "app",
+  "server_roles": [
+    "app"
+  ],
+  "type": {
+    "app": [
+      "rails",
+      "unicorn"
+    ]
+  },
+  "database_master_role": [
+    "database_master"
+  ],
+  "repository": "git@github.com:startatlanta/test-rails-mongodb.git",
+  "revision": {
+    "staging": "master",
+    "production": "master"
+  },
+  "force": {
+    "staging": "true",
+    "production": "true"
+  },
+  "migrate": {
+    "staging": "true",
+    "production": "true"
+  },
+  "databases": {
+    "staging": {
+      "reconnect": "true",
+      "encoding": "utf8",
+      "adapter": "mongoid",
+      "database": "rails_app_staging",
+      "port": "27017"
+    },
+    "production": {
+      "reconnect": "true",
+      "encoding": "utf8",
+      "adapter": "mongoid",
+      "database": "rails_app_production",
+      "port": "27017"
+    }
+  },
+  "deploy_key": "-----BEGIN RSA PRIVATE KEY-----\nMIIEogIBAAKCAQEAqucyfzxY0gqb5ogEFDBKsAVjVwdt91c5Jh0Whc2e8WA9l/cs\nZX/HjvL8/uRJCU+nlTkB+BFQdxVD1D8RJs222uoM26HF1d4oFTPJbpu5l/733Bmf\nkd++zD+5pDEMCIq/6b9G1zi9QjHguhGZTaN7jRKl0ZBrYpoAMTZrO3wLifawsqwu\nGtlPd+iJCZtUvgAPG7CzTFwMGmkTnqemab4gzBd1PByxo4nOq+5x/tWkxFoXh6VT\n0t5MpuFtmNVjsEeO1DxcltzwFLENN7ErSkkr93Zrf2ScLqDQaTZhSdWLPITVx7Wk\nvbVAE9vR3b8Xo3IJc0arBNqNvPcm9IfiEPGDBwIBIwKCAQA6mGkVrkpWpI05GLDw\n+p1DqhNuS7Csku8FwNSFpZWUlgZ9Ps1koNa0qxTprVrenveg4FhyTxRGFetetomJ\npZ3HZjBLTWhmlU+SPaQl7D+h08Kx3OZApHvuQbv9x6xaszp8BxD5VUgz89gFR9zK\nKWwwXio5ONRcUg6xyYPZ4WMKums31oPGm7xYSpczYy+YRch+db2sIxwngu+ZsGB8\nGmYjP5im5tMzun4DerYcxHb02KjiZgmAtbyVn59WABNBuirEd4MVzNOO632qRG32\nJ9uAlC/T3gyMSlF6CJ6BWnkpgc42GhTX+4cP7hyU7SkqLSesXKbdPiqTwVExOiNp\nsDVrAoGBANleQeQTk2dYNyBkQ5lczDXpUx3aMrt21aZvR6v8zBz1l/N/T5fLxS8I\n7ZS4LC0tOCM2Pgie8Gr19jFhtOM9KpA7NJgrI6nKmLScO5erjcPPVdVx+IB/+K2V\nukW8a7Cs+RJ3k+uWACbqXGMiXp62PU+nPTWbSPXymZOPajTL6T1zAoGBAMlG40mu\nqlgeLS+ky8XlEvsW24GRbZPbADJZyDZYT69FBgSAq9yA5LAY2vTIFxyiVLJnva98\nhnunLwDRoEhIvgHcAIYWzofpPtTALf2QxyfxGwqOJHcVegqE4vfpd06BJn8yVacH\nF3nls5teV2uHhltqpeQO8Zubabvq3sX7cP8dAoGBAKevHOMlC0+5FJVUqS0qVGQa\nZLChApCdgD6QW9xyjtSC8Y/0fzqV4UGKi2QZDCLZvZeBnZGfLn5l+G88vr3tW1lS\nPoQEBZGcSepp5NQWoI+9M5YHdo8DopSJcnBPhkZ2zsUaasuuOqGtenhcV58BnQLu\nujCq/cULmwtuomM+N5XNAoGAbUO9NqClnYy5caKagV8Y7rSjC9KakhfM6CIcOsI5\n4s2yzz6JLo8dDyNvjDIbLM0mqf3NX0OZdlNxSZZeUyAsoex1UBsCZwmXIwk9iaZd\nfBUr78mBgnlfgg2fyGjLvOcGRQyyJ3jg28XWh4r8Qa/4esTdtlFBVHjwQXDfVYh/\nK2cCgYEAsHFGFIlgoK1ytfZP5BOYqEObDS6mJONW4HQql8Em1q5iwXVpYxXjoxMA\nRFzVZwOdazGsU2XjmXVNHBpQl60YRJGcZRZ0gu4rFJkwhpdNWTSGHcq8GLWk7Rbl\nWROWDsljmcRb6VhfRM4Bchwjk1gjQFKJWVIo5j/xzlRV2kOorYE=\n-----END RSA PRIVATE KEY-----",
+  "deploy_to": "/srv/app",
+  "owner": "nobody",
+  "group": "nogroup",
+  "packages": {
+    "curl":""
+  },
+  "gems": {
+    "rails": "3.0.3",
+    "bundler":"1.0.9"
+  }
+}

@@ -31,7 +31,10 @@ db_flavor = String.new
 search(:apps) do |app|
   (app['database_master_role'] & node.run_list.roles).each do |dbm_role|
     # set the flavor based on the db adapter attribute
-    db_flavor = app["databases"][node.app_environment]["adapter"]
+    db_flavor = case app["databases"][node.app_environment]["adapter"]
+      when /mysql/ then 'mysql'
+      when /mongoid/ then 'mongodb'
+    end
     %w{ root repl debian }.each do |user|
       user_pw = app["#{db_flavor}_#{user}_password"]
       if !user_pw.nil? and user_pw[node.app_environment]

@@ -1,0 +1,8 @@
+{
+  "id": "bofh",
+  "ssh_keys": "ssh-rsa AAA....yhCw== bofh",
+  "groups": "sysadmin",
+  "uid": 2001,
+  "shell": "\/bin\/bash",
+  "comment": "BOFH"
+}

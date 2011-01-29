@@ -1,8 +1,8 @@
 #
 # Cookbook Name:: application
-# Recipe:: default
+# Recipe:: cake_php
 #
-# Copyright 2009, Opscode, Inc.
+# Copyright 2010, Opscode, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,19 +19,16 @@
 
 app = node.run_state[:current_app]
 
+# include php
+include_recipe 'php5'
+include_recipe 'php5-cli'
+
 ###
 # You really most likely don't want to run this recipe from here - let the
 # default application recipe work it's mojo for you.
 ###
 
-# Are we using REE?
-use_ree = false
-if node.run_state[:seen_recipes].has_key?("ruby_enterprise")
-  use_ree = true
-end
-
 node.default[:apps][app['id']][node.app_environment][:run_migrations] = false
-db_config_name = 'database'
 
 ## First, install any application specific packages
 if app['packages']
@@ -74,7 +71,7 @@ directory "#{app['deploy_to']}/shared" do
   recursive true
 end
 
-%w{ log pids system vendor_bundle }.each do |dir|
+%w{ log pids system }.each do |dir|
 
   directory "#{app['deploy_to']}/shared/#{dir}" do
     owner app['owner']
@@ -126,38 +123,18 @@ if app["database_master_role"]
 
   # Assuming we have one...
   if dbm
-    db_config_name = app["databases"][node.app_environment]["adapter"].eql?('mongoid') ? 'mongoid' : 'database'
-    template "#{app['deploy_to']}/shared/#{db_config_name}.yml" do
-      source "#{db_config_name}.yml.erb"
+    template "#{app['deploy_to']}/shared/database.php" do
+      source "database.php.erb"
       owner app["owner"]
       group app["group"]
       mode "644"
       variables(
         :host => dbm['fqdn'],
-        :databases => app['databases']
+        :database => app['databases'][node[:app_environment]]
       )
     end
   else
-    Chef::Log.warn("No node with role #{app["database_master_role"][0]}, #{db_config_name}.yml not rendered!")
-  end
-end
-
-if app["memcached_role"]
-  results = search(:node, "role:#{app["memcached_role"][0]} AND app_environment:#{node[:app_environment]} NOT hostname:#{node[:hostname]}")
-  if results.length == 0
-    if node.run_list.roles.include?(app["memcached_role"][0])
-      results << node
-    end
-  end
-  template "#{app['deploy_to']}/shared/memcached.yml" do
-    source "memcached.yml.erb"
-    owner app["owner"]
-    group app["group"]
-    mode "644"
-    variables(
-      :memcached_envs => app['memcached'],
-      :hosts => results.sort_by { |r| r.name }
-    )
+    Chef::Log.warn("No node with role #{app["database_master_role"][0]}, database.php not rendered!")
   end
 end
 
@@ -168,16 +145,13 @@ deploy_revision app['id'] do
   user app['owner']
   group app['group']
   deploy_to app['deploy_to']
-  environment 'RAILS_ENV' => node.app_environment
+  #environment 'RAILS_ENV' => node.app_environment
   action app['force'][node.app_environment] ? :force_deploy : :deploy
   ssh_wrapper "#{app['deploy_to']}/deploy-ssh-wrapper" if app['deploy_key']
 
   before_migrate do
     if app['gems'].has_key?('bundler')
-      link "#{release_path}/vendor/bundle" do
-        to "#{app['deploy_to']}/shared/vendor_bundle"
-      end
-      execute "bundle install --deployment" do
+      execute "bundle install" do
         ignore_failure true
         cwd release_path
       end
@@ -194,20 +168,20 @@ deploy_revision app['id'] do
       #
       # maybe worth doing run_symlinks_before_migrate before before_migrate callbacks,
       # or an add'l callback.
-      execute "(ln -s ../../../shared/#{db_config_name}.yml config/#{db_config_name}.yml && rake gems:install); rm config/#{db_config_name}.yml" do
+      execute "(ln -s ../../../shared/database.php app/config/database.php); rm app/config/database.php" do
         ignore_failure true
         cwd release_path
       end
     end
   end
+
   symlink_before_migrate({
-    "#{db_config_name}.yml" => "config/#{db_config_name}.yml",
-    "memcached.yml" => "config/memcached.yml"
+    "database.php" => "app/config/database.php"
   })
 
   if app['migrate'][node.app_environment] && node[:apps][app['id']][node.app_environment][:run_migrations]
     migrate true
-    migration_command app['migration_command'] || "rake db:migrate"
+    migration_command app['migration_command'] || "cake migration up"
   else
     migrate false
   end
