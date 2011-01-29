@@ -19,12 +19,12 @@ defaults
         contimeout      5000
         clitimeout      50000
         srvtimeout      50000
-        
+
 # Set up application listeners here.
 listen application 0.0.0.0:80
   balance roundrobin
   <% @pool_members.each do |member| -%>
-  <% server_ip = member.has_key?("ec2") ? member["ec2"]["public_ipv4"] : member["ipaddress"] -%>
+  <% server_ip = member["ipaddress"] -%>
   server <%= member["hostname"] %> <%= server_ip %>:<%= node["haproxy"]["member_port"] %> weight 1 maxconn 1 check 
   <% end -%>
 <% if node["haproxy"]["enable_admin"] -%>
