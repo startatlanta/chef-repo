@@ -164,6 +164,13 @@ You will not need to use `capistrano` or any other deployment scripts as the `ap
 
     knife ssh 'role:app' 'sudo chef-client' -a ec2.public_hostname --ssh-user ubuntu
 
+Database Migrations
+-------------------
+
+The application cookbook decides if it should run migrations during a deploy if the `run_migrations` role is present in a nodes run list.  After the migrations are run the role is removed to prevent migrations from running during the next deployment.  You can re-add this role to an application server's run_list by using the following knife command:
+
+    knife node run_list add SOME_NODE_NAME 'role[run_migrations]'
+
 Rackspace Cloud Notes
 ---------------------
 
