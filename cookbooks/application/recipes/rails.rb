@@ -126,7 +126,7 @@ if app["database_master_role"]
 
   # Assuming we have one...
   if dbm
-    db_config_name = app["databases"][node.app_environment]["adapter"].eql?('mongoid') ? 'mongoid' : 'database'
+    db_config_name = app["databases"][node.app_environment]["adapter"] =~ /mongodb/ ? 'mongoid' : 'database'
     template "#{app['deploy_to']}/shared/#{db_config_name}.yml" do
       source "#{db_config_name}.yml.erb"
       owner app["owner"]

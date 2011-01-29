@@ -19,9 +19,12 @@
 
 app = node.run_state[:current_app] 
 
+node.default["apache"]["listen_ports"] = [ "8080" ]
+
 include_recipe "apache2"
-include_recipe "apache2::mod_ssl"
 include_recipe "apache2::mod_rewrite"
+include_recipe "apache2::mod_deflate"
+include_recipe "apache2::mod_headers"
 include_recipe "apache2::mod_php5"
 
 server_aliases = [ "#{app['id']}.#{node[:domain]}", node.fqdn ]
@@ -32,14 +35,17 @@ end
 
 web_app app['id'] do
   docroot "#{app['deploy_to']}/current/app/webroot"
+  template 'php.conf.erb'
   server_name "#{app['id']}.#{node[:domain]}"
   server_aliases server_aliases
   log_dir node[:apache][:log_dir]
 end
 
-d = resources(:deploy => app['id'])
-d.restart_command do
-  service "apache2" do action :restart; end
+if ::File.exists?(::File.join(app['deploy_to'], "current"))
+  d = resources(:deploy => app['id'])
+  d.restart_command do
+    service "apache2" do action :restart; end
+  end
 end
 
 apache_site "000-default" do

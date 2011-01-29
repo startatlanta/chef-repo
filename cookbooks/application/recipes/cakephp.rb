@@ -19,14 +19,20 @@
 
 app = node.run_state[:current_app]
 
-# include php
-include_recipe 'php5'
-include_recipe 'php5-cli'
-
 ###
 # You really most likely don't want to run this recipe from here - let the
 # default application recipe work it's mojo for you.
 ###
+
+packages = value_for_platform([ "centos", "redhat", "fedora", "suse" ] => {"default" => %w(php php-cli php-Smarty)}, "default" => %w{php5 php5-dev php5-cli smarty})
+
+packages.each do |pkg|
+  package pkg do
+    action :upgrade
+  end
+end
+
+include_recipe 'php::pear'
 
 node.default[:apps][app['id']][node.app_environment][:run_migrations] = false
 
@@ -36,23 +42,6 @@ if app['packages']
     package pkg do
       action :install
       version ver if ver && ver.length > 0
-    end
-  end
-end
-
-## Next, install any application specific gems
-if app['gems']
-  app['gems'].each do |gem,ver|
-    if use_ree
-      ree_gem gem do
-        action :install
-        version ver if ver && ver.length > 0
-      end
-    else
-      gem_package gem do
-        action :install
-        version ver if ver && ver.length > 0
-      end
     end
   end
 end
@@ -71,16 +60,16 @@ directory "#{app['deploy_to']}/shared" do
   recursive true
 end
 
-%w{ log pids system }.each do |dir|
-
-  directory "#{app['deploy_to']}/shared/#{dir}" do
-    owner app['owner']
-    group app['group']
-    mode '0755'
-    recursive true
-  end
-
-end
+# %w{ log pids system }.each do |dir|
+# 
+#   directory "#{app['deploy_to']}/shared/#{dir}" do
+#     owner app['owner']
+#     group app['group']
+#     mode '0755'
+#     recursive true
+#   end
+# 
+# end
 
 if app.has_key?("deploy_key")
   ruby_block "write_key" do
@@ -123,6 +112,8 @@ if app["database_master_role"]
 
   # Assuming we have one...
   if dbm
+    include_recipe "php::module_#{app['databases'][node[:app_environment]]['adapter']}"
+    
     template "#{app['deploy_to']}/shared/database.php" do
       source "database.php.erb"
       owner app["owner"]
@@ -145,23 +136,18 @@ deploy_revision app['id'] do
   user app['owner']
   group app['group']
   deploy_to app['deploy_to']
-  #environment 'RAILS_ENV' => node.app_environment
   action app['force'][node.app_environment] ? :force_deploy : :deploy
   ssh_wrapper "#{app['deploy_to']}/deploy-ssh-wrapper" if app['deploy_key']
-
+  
+  purge_before_symlink([])
+  create_dirs_before_symlink([])
+  symlinks({})
+  symlink_before_migrate({
+    "database.php" => "app/config/database.php"
+  })
+  
   before_migrate do
-    if app['gems'].has_key?('bundler')
-      execute "bundle install" do
-        ignore_failure true
-        cwd release_path
-      end
-    elsif app['gems'].has_key?('bundler08')
-      execute "gem bundle" do
-        ignore_failure true
-        cwd release_path
-      end
-
-    elsif node.app_environment && app['databases'].has_key?(node.app_environment)
+    if node.app_environment && app['databases'].has_key?(node.app_environment)
       # chef runs before_migrate, then symlink_before_migrate symlinks, then migrations,
       # yet our before_migrate needs database.yml to exist (and must complete before
       # migrations).
@@ -173,12 +159,18 @@ deploy_revision app['id'] do
         cwd release_path
       end
     end
+    
+    %w{tmp tmp/cache tmp/cache/persistent tmp/cache/models}.each do |dir|
+      directory "#{release_path}/app/#{dir}" do
+        owner app['owner']
+        group app['group']
+        mode "0777"
+        recursive true
+        action :create
+      end
+    end
   end
-
-  symlink_before_migrate({
-    "database.php" => "app/config/database.php"
-  })
-
+  
   if app['migrate'][node.app_environment] && node[:apps][app['id']][node.app_environment][:run_migrations]
     migrate true
     migration_command app['migration_command'] || "cake migration up"

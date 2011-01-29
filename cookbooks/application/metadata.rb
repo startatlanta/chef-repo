@@ -13,6 +13,6 @@ recipe           "application::rails_nginx_ree_passenger", "Deprecated recipe th
 recipe           "application::tomcat", "Sets up the deployed Java application with Tomcat as the servlet container"
 recipe           "application::unicorn", "Sets up the deployed Rails application with Unicorn as the web server"
 
-%w{ ruby_enterprise passenger_enterprise runit unicorn apache2 passenger_apache2 tomcat}.each do |cb|
+%w{ ruby_enterprise passenger_enterprise runit unicorn apache2 passenger_apache2 tomcat php}.each do |cb|
   depends cb
 end

@@ -29,14 +29,14 @@
     "staging": {
       "reconnect": "true",
       "encoding": "utf8",
-      "adapter": "mongoid",
+      "adapter": "mongodb",
       "database": "app_staging",
       "port": "27017"
     },
     "production": {
       "reconnect": "true",
       "encoding": "utf8",
-      "adapter": "mongoid",
+      "adapter": "mongodb",
       "database": "app_production",
       "port": "27017"
     }

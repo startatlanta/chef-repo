@@ -31,7 +31,7 @@ Obtain the repository used for this guide. It contains all the components requir
 
     sudo gem install fog net-ssh-multi
 
-As part of the [Getting Started Guide](help.opscode.com/faqs/start/how-to-get-started), you cloned a chef-repo and copied the Knife configuration file (knife.rb), validation certificate (ORGNAME-validator.pem) and user certificate (USERNAME.pem) to `~/chef-repo/.chef/`. Copy these files to the new rails-quick-start repository. You can also re-download the Knife configuration file for your [Organization from the Management Console](http://help.opscode.com/faqs/start/user-environment).
+As part of the [Getting Started Guide](help.opscode.com/faqs/start/how-to-get-started), you downloaded a validation certificate (ORGNAME-validator.pem) and user certificate (USERNAME.pem) to your local workstation.  Create a `.chef` in your user home directory and place the two private key's there.
 
     mkdir ~/.chef
     cp ~/Downloads/USERNAME.pem ~/.chef/USERNAME.pem
@@ -43,12 +43,14 @@ You will also have to export a few environment variables:
     export ORGNAME='replace with your Opscode Platform organization name'
     
     # Amazon AWS
-    export AWS_ACCESS_KEY_ID='replace with the Amazon Access Key ID'
-    export AWS_SECRET_ACCESS_KEY='replace with the Amazon Secret Access Key ID'
+    export AWS_ACCESS_KEY_ID='replace with your Amazon Access Key ID'
+    export AWS_SECRET_ACCESS_KEY='replace your the Amazon Secret Access Key ID'
     # Rackspace Cloud
-    export RACKSPACE_USERNAME='replace with the Rackspace Username'
-    export RACKSPACE_API_KEY='replace with the Rackspace API Key
-    
+    export RACKSPACE_USERNAME='replace with your Rackspace Username'
+    export RACKSPACE_API_KEY='replace with your Rackspace API Key
+
+You can ignore the `knife.rb` file that you downloaded as part of the [Getting Started Guide](help.opscode.com/faqs/start/how-to-get-started), we have included a knife config file along with this chef-repo.  Knife will look for it's configuration file in the current directory first then search upward until it finds a file.  This allows you to have multiple chef repositories all pointed at separate Opscode Platform organizations.
+
 Acquire Cookbooks
 ----
 
@@ -90,7 +92,7 @@ We will be using Chef's Data Bag feature to store data that will be shared betwe
 
 ### Application Configuration
 
-Edit the existing application config for your chosen deploy stack
+Edit the example application config for your chosen deploy stack
 
     vim data_bags/apps/rails_mysql.json
 
@@ -100,7 +102,7 @@ Upload your application config to the server:
 
 ### Users
 
-Create a user.
+Create a user item.
 
     vim data_bags/users/bofh.json
       {
@@ -146,20 +148,20 @@ Have separate database, application and load balancer servers:
 Application Code Deployment
 ---------------------------
 
-You will not need to use `capistrano` or any other deployment scripts as the `applicaiton` cookbook that is included as part of this repository will automatically "pull" any code updates down from your git repository.  You can force a Chef run on your application servers by issue the following Knife command:
+You will not need to use `capistrano` or any other deployment scripts as the `applicaiton` cookbook that is included as part of this chef-repo will automatically "pull" any code updates down from your git repository every time Chef runs on your app server nodes.  You can force a Chef run on your application servers by issue the following Knife command:
 
     knife ssh 'role:app' 'sudo chef-client' -a ec2.public_hostname --ssh-user ubuntu
 
-Rackspace Notes
----------------
+Rackspace Cloud Notes
+---------------------
 
-The above commands assume Amazon EC2 was your chosen cloud provider.  If you would like to use Rackspace the commands will be as follows:
+The above commands assume you are using Amazon EC2 as your chosen cloud provider.  The `knife ec2 server create` subcommand does provisioning and bootstrapping of your server in a single step.  The current version of the `knife rackspace server create` subcommand require provisioning and bootstrapping to occur in separate steps (this has already been [fixed in Chef HEAD](http://tickets.opscode.com/browse/CHEF-1445)).
 
-    knife rackspace server create 'role[production]' 'role[base]' \
-      'role[database_master]' 'role[app]' 'role[run_migrations]' 'role[load_balancer]' \
-      --flavor 3 --image 49
+To provision a Rackspace Cloud instance use this command:
 
-Image 49 is Ubuntu 10.04 LTS (lucid) and valid flavor IDs are as follows:
+    knife rackspace server create --server-name startatlanta --flavor 3 --image 49
+
+Image ID 49 is Ubuntu 10.04 LTS (lucid).  Valid flavor IDs are as follows:
 
     ID 1 = 256 server
     ID 2 = 512 server
@@ -168,6 +170,15 @@ Image 49 is Ubuntu 10.04 LTS (lucid) and valid flavor IDs are as follows:
     ID 5 = 4GB server
     ID 6 = 8GB server
     ID 7 = 15.5GB server
+
+Make note of the public ip address password that is returned by the command above, you will need to to perform the bootstrapping:
+
+    knife bootstrap PUBLIC_IP --run-list 'role[production]','role[base]','role[database_master]','role[app]','role[run_migrations]','role[load_balancer]' \
+      --ssh-user root --ssh-password PASSWORD
+
+You can force a Chef run on your application servers by issue the following Knife command:
+
+    knife ssh 'role:app' 'sudo chef-client' -a rackspace.public_hostname --ssh-user USER
 
 Vagrant
 -------

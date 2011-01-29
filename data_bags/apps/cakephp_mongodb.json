@@ -1,1 +1,50 @@
-TODO
+{
+  "id": "app",
+  "server_roles": [
+    "app"
+  ],
+  "type": {
+    "app": [
+      "cakephp",
+      "mod_php_apache2"
+    ]
+  },
+  "database_master_role": [
+    "database_master"
+  ],
+  "repository": "git://github.com/startatlanta/test-cakephp-mongodb.git",
+  "revision": {
+    "staging": "master",
+    "production": "master"
+  },
+  "force": {
+    "staging": "true",
+    "production": "true"
+  },
+  "migrate": {
+    "staging": "true",
+    "production": "true"
+  },
+  "databases": {
+    "staging": {
+      "reconnect": "true",
+      "encoding": "utf8",
+      "adapter": "mongodb",
+      "database": "app_staging",
+      "port": "27017"
+    },
+    "production": {
+      "reconnect": "true",
+      "encoding": "utf8",
+      "adapter": "mongodb",
+      "database": "app_production",
+      "port": "27017"
+    }
+  },
+  "deploy_to": "/srv/app",
+  "owner": "nobody",
+  "group": "nogroup",
+  "packages": {
+    "curl":""
+  }
+}
