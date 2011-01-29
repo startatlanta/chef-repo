@@ -214,9 +214,9 @@ deploy_revision app['id'] do
   before_symlink do
     ruby_block "remove_run_migrations" do
       block do
-        if node.role?("#{app['id']}_run_migrations")
-          Chef::Log.info("Migrations were run, removing role[#{app['id']}_run_migrations]")
-          node.run_list.remove("role[#{app['id']}_run_migrations]")
+        if node.role?("run_migrations")
+          Chef::Log.info("Migrations were run, removing role[run_migrations]")
+          node.run_list.remove("role[run_migrations]")
         end
       end
     end
