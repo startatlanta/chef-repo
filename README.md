@@ -6,36 +6,28 @@ TODO: THIS README STILL NEEDS TO BE FLESHED OUT!
 Pick your Stack
 ---------------
 
-* Rails 3 + Mysql
-* Rails 3 + MongoDB
-* CakePHP + Mysql
-* CakePHP + MongoDB
+* Rails 3 on Unicorn + Mysql
+* Rails 3 on Unicorn + MongoDB
+* CakePHP on mod_php/Apache2 + Mysql
+* CakePHP on mod_php/Apache2 + MongoDB
 
 Edit the Application Config Data Bag Item
 -----------------------------------------
 
-Use knife to create a data bag for users.
-  
-  % knife data bag create apps
-
 Edit the existing application config for your chosen deploy stack
 
-  % vim data_bags/apps/rails_mysql.json
+    % vim data_bags/apps/rails_mysql.json
 
 Upload your application config to the server:
 
-  % knife data bag from file apps rails_mysql.json
+    % knife data bag from file apps rails_mysql.json
 
 Add a User to the Users Data Bag
 --------------------------------
 
-Use knife to create a data bag for users.
-  
-  % knife data bag create users
-  
 Create a user.
 
-  % knife data bag users bofh
+    % vim data_bags/users/bofh.json
       {
         "id": "bofh",
         "ssh_keys": "ssh-rsa AAA....yhCw== bofh",
@@ -47,7 +39,7 @@ Create a user.
 
 Upload the item to the server
 
-  % knife data bag from file users bofh.json
+    % knife data bag from file users bofh.json
   
 Build a Server(s)
 -----------------
@@ -75,4 +67,3 @@ Have separate database, application and load balancer servers:
     knife ec2 server create 'role[production]' 'role[base]' 'role[load_balancer]' \
       -S start-atlanta -I ~/.ssh/start-atlanta.pem -x ubuntu \
       -G default -i ami-88f504e1 -f m1.small
-
