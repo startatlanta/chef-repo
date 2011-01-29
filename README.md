@@ -96,7 +96,11 @@ We will be using Chef's Data Bag feature to store data that will be shared betwe
 
 ### Application Configuration
 
-Edit the example application config for your chosen deploy stack
+Create the application data bag:
+
+    knife data bag create apps
+
+Edit the example application config for your chosen deploy stack:
 
     vim data_bags/apps/rails_mysql.json
 
@@ -106,7 +110,11 @@ Upload your application config to the server:
 
 ### Users
 
-Create a user item.
+Create the users data bag:
+
+    knife data bag create users
+
+Create a user item:
 
     vim data_bags/users/bofh.json
       {
