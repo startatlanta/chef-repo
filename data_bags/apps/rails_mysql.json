@@ -29,18 +29,18 @@
     "staging": {
       "reconnect": "true",
       "encoding": "utf8",
-      "username": "rails_app_user",
+      "username": "app_user",
       "adapter": "mysql2",
       "password": "bzq8vAe4szeeaM",
-      "database": "rails_app_staging"
+      "database": "app_staging"
     },
     "production": {
       "reconnect": "true",
       "encoding": "utf8",
-      "username": "rails_app_user",
+      "username": "app_user",
       "adapter": "mysql2",
       "password": "bzq8vAe4szeeaM",
-      "database": "rails_app_production"
+      "database": "app_production"
     }
   },
   "mysql_root_password": {

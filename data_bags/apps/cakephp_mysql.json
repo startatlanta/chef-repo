@@ -1,1 +1,64 @@
-TODO
+{
+  "id": "app",
+  "server_roles": [
+    "app"
+  ],
+  "type": {
+    "app": [
+      "cakephp",
+      "mod_php_apache2"
+    ]
+  },
+  "database_master_role": [
+    "database_master"
+  ],
+  "repository": "git://github.com/startatlanta/test-cakephp-mysql.git",
+  "revision": {
+    "staging": "master",
+    "production": "master"
+  },
+  "force": {
+    "staging": "true",
+    "production": "true"
+  },
+  "migrate": {
+    "staging": "true",
+    "production": "true"
+  },
+  "databases": {
+    "staging": {
+      "reconnect": "true",
+      "encoding": "utf8",
+      "username": "rails_app_user",
+      "adapter": "mysql2",
+      "password": "bzq8vAe4szeeaM",
+      "database": "app_staging"
+    },
+    "production": {
+      "reconnect": "true",
+      "encoding": "utf8",
+      "username": "rails_app_user",
+      "adapter": "mysql2",
+      "password": "bzq8vAe4szeeaM",
+      "database": "app_production"
+    }
+  },
+  "mysql_root_password": {
+    "staging": "i6Uigy4GkqHHhV",
+    "production": "i6Uigy4GkqHHhV"
+  },
+  "mysql_debian_password": {
+    "staging": "Enej8PEcTHk6Wx",
+    "production": "Enej8PEcTHk6Wx"
+  },
+  "mysql_repl_password": {
+    "staging": "UfjvcYnmD2a6Wv",
+    "production": "UfjvcYnmD2a6Wv"
+  },
+  "deploy_to": "/srv/app",
+  "owner": "nobody",
+  "group": "nogroup",
+  "packages": {
+    "curl":""
+  }
+}
