@@ -40,6 +40,10 @@ As part of the [Getting Started Guide](help.opscode.com/faqs/start/how-to-get-st
 You will also have to export a few environment variables:
     
     vim ~/.zshrc
+    
+    #export EDITOR="mate -w"
+    export EDITOR="/usr/local/bin/vim" # vim rox
+    
     export ORGNAME='replace with your Opscode Platform organization name'
     
     # Amazon AWS
